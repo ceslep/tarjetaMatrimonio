@@ -1,52 +1,69 @@
-# LabMyCar — SPA de Laboratorio Clínico (Svelte 5 + TypeScript + Tailwind)
+# Tarjeta de Matrimonio 3D
 
-Migración de la aplicación Flutter **"mycar"** (gestión de laboratorio clínico) a una SPA
-de escritorio-first responsive, consumiendo el backend PHP existente en
-`https://mycar.iedeoccidente.com/libphp/`.
+Invitación web interactiva para la boda de **Yenifer & César** — 30 de septiembre de 2026, Restaurante La Criolla (Anserma, Caldas).
 
-## Comandos
+Construida con **Svelte 5 (runes)**, **TypeScript**, **Tailwind CSS 4** y **Three.js**.
 
-| Tarea | Comando |
+## Inicio rápido
+
+```bash
+npm install
+npm run dev
+```
+
+## Scripts
+
+| Comando | Descripción |
 |---|---|
-| Desarrollo | `npm run dev` |
-| Verificación (tipos) | `npm run check` |
-| Build producción (raíz) | `npm run build` |
-| Build para servirse bajo `/libphp/app/` | `npm run build:app` |
-| Vista previa del build | `npm run preview` |
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run preview` | Vista previa del build |
+| `npm run check` | Verificación de tipos |
+| `npm run deploy` | Build + despliegue a GitHub Pages |
+| `npm run photos` | Regenerar derivados de fotos |
+| `npm run shot` | Captura headless (Chrome) |
+| `npm run test` | Tests |
 
-## Módulos (rutas con hash)
-
-- `/login` — acceso del laboratorio (clave T.P. de `configuracion`).
-- `/inicio` · `/pacientes` · `/pacientes/nuevo` · `/paciente/:id/editar` · `/paciente/:id/examenes`
-- `/crear-examen` — asistente 3 pasos (paciente+fecha → catálogo → guardar `guardarExamenes.php`).
-- `/registro/:id/:codexamen/:fecha/:tipo` — registro de resultados (tipos 1,2,3,4,5,6,8) con esquema declarativo.
-- `/resultados` · `/configuracion` (Laboratorio + Procedimientos + opciones) · `/procedimiento/:codigo`
-- `/panel` — gestión por fecha y búsqueda de pacientes con exámenes.
-- `/portal` — consulta pública de resultados (identificación + número verificador).
-
-## Arquitectura
+## Estructura
 
 ```
 src/
-├─ App.svelte            # Sesión, banner de conexión y despacho de rutas
+├─ App.svelte              # Canvas WebGL + secciones HTML
+├─ app.css                 # Tema Negro & Oro (Tailwind 4)
 ├─ lib/
-│  ├─ api/laboratorio.ts # Cliente HTTP tipado de los endpoints PHP
-│  ├─ core/              # config (URL base), http (fetch + serverDown + CORS text/plain)
-│  ├─ models/            # Tipos 1:1 con bd.sql y respuestas del servidor
-│  ├─ schemas/resultados.ts  # Esquemas declarativos de los formularios de examen
-│  ├─ reportes/print.ts  # Generación de reportes HTML imprimibles (PDF en cliente)
-│  ├─ stores/            # Sesión y toasts (runes)
-│  └─ ui/                # Iconos, campos, estados, tarjetas, toasts…
-└─ routes/               # Páginas (una por módulo)
+│  ├─ config.ts            # Configuración editable (nombres, fecha, fotos)
+│  ├─ state.svelte.ts      # Estado con runes
+│  ├─ personal.ts          # Datos personalizados
+│  ├─ preload.ts           # Precarga de multimedia
+│  ├─ api/rsvp.ts          # Envío de confirmaciones
+│  ├─ components/          # UI: Preloader, Hero, Gallery, Countdown, RSVP...
+│  └─ three/
+│     ├─ world.ts          # Renderer, cámara, scroll, picking
+│     ├─ envelope.ts       # Acto I-II: sobre, lacre, tarjeta
+│     ├─ gallery.ts        # Acto III: carrusel de fotos 3D
+│     ├─ dust.ts           # Partículas de polvo dorado
+│     ├─ materials.ts      # Materiales PBR
+│     ├─ textures.ts       # Carga y generación de texturas
+│     └─ utils.ts          # Utilidades de animación
+├─ public/fotos/           # Fotos optimizadas (no subir originales)
+├─ libphp/                 # Backend PHP (confirmaciones → Google Sheets)
+└─ scripts/                # Scripts auxiliares
 ```
 
-### Notas técnicas
-- **CORS**: el backend responde `Access-Control-Allow-Origin: *` pero no completa
-  preflight OPTIONS; el cliente envía el JSON sin `Content-Type` explícito
-  (`text/plain`, exento de preflight), igual que el cliente Dart original.
-- **PDF**: los reportes se generan en el navegador (HTML + CSS de impresión) y se
-  imprimen/guardan como PDF con el diálogo nativo. No dependen de `printphp/`.
-- **Despliegue**: `npm run build:app` genera `dist/` con base `/libphp/app/`;
-  súbalo a `https://mycar.iedeoccidente.com/libphp/app/` (mismo origen que la API,
-  sin CORS) mediante tu sincronización WinSCP.
-- La carpeta `libphp/` es el espejo del backend; **no** es parte del build de la SPA.
+## Despliegue
+
+```bash
+npm run deploy
+```
+
+Publica el build en **GitHub Pages** vía `gh-pages`.
+
+Para despliegue manual: sube el contenido de `dist/` al servidor destino.
+
+## Stack
+
+- **Svelte 5** — runes, reactividad por signals
+- **Three.js** — escena 3D: sobre lacrado, carrusel de fotos, polvo dorado
+- **Tailwind CSS 4** — theming con `@theme`
+- **TypeScript** — tipado estricto
+- **Vite** — bundler y dev server
